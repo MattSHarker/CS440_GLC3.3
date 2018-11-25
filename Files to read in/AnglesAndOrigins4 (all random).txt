@@ -1,0 +1,4 @@
+Line 1 is angles (float * 2pi) | Line 2 is X CoOrd | Line 3 is Y CoOrd | all numbers are relative, for Line1 it is a percentage around the circle, Line2 is percentage across the xAxis, Line is same but Yaxis
+0.47,0.78,0.08,0.88
+0.19,0.38,0.75,0.93
+0.36,0.27,0.53,0.22
