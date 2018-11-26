@@ -28,4 +28,3 @@ LINE HEADS
 a: Sets the line end style to arrow head
 f: sets the line end style to flat head
 n: removes any line end style
-
