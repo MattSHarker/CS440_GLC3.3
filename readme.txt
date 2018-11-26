@@ -1,5 +1,5 @@
 This project is for Team 2: Gabriel Anderson and Matthew Harker
-This program will display both figures 3.1 and 3.3
+This program will display figures 3.1 and 3.3
 
 Upon running the program, it will prompt for the file containing the Iris data-set. Select it.
 Next, it will prompt for a file containing data for the angles and origins for the vectors. Select one.
@@ -14,10 +14,10 @@ space bar: toggles between Figure 3.1 and Figure 3.3
 E: closes the program
 
 COLORS
-r: toggles the red lines (Iris Setosa)
-g: toggles the green lines (Iris Versicolor)
-b: toggles the blue lines (Iris Virginica)
-B: toggles the black lines (lines to represent the base angle/origin)
+r: toggles the red lines (Iris Setosa)  (you can also use 1)
+g: toggles the green lines (Iris Versicolor)  (you can also use 2)
+b: toggles the blue lines (Iris Virginica)  (you can also use 3)
+B: toggles the black lines (lines to represent the base angle/origin)  (you can also use 4 or l)
 
 SIZE
 +: increases the overall size of the vizualization. The ratios will remain the same
