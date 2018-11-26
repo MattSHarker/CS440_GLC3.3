@@ -1,9 +1,18 @@
-﻿Build started 11/24/2018 6:20:27 PM.
+﻿Build started 11/25/2018 7:55:29 PM.
      1>Project "C:\Users\Matthew\Documents\GitHub\CS440_GLC3.3\Final Project\fig2-10.vcxproj" on node 2 (Build target(s)).
-     1>Link:
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _VC80_UPGRADE=0x0600 /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /Gy- /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\Debug\\" /Fd".\Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt "fig2-10.CPP"
+         fig2-10.CPP
+     1>c:\users\matthew\documents\github\cs440_glc3.3\final project\fig2-10.cpp(286): warning C4390: ';' : empty controlled statement found; is this the intent?
+     1>c:\users\matthew\documents\github\cs440_glc3.3\final project\fig2-10.cpp(443): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\matthew\documents\github\cs440_glc3.3\final project\fig2-10.cpp(529): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\matthew\documents\github\cs440_glc3.3\final project\fig2-10.cpp(648): warning C4390: ';' : empty controlled statement found; is this the intent?
+     1>c:\users\matthew\documents\github\cs440_glc3.3\final project\fig2-10.cpp(718): warning C4018: '<' : signed/unsigned mismatch
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:".\Debug\fig2-10.exe" /INCREMENTAL /NOLOGO odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:".\Debug\fig2-10.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\Debug\fig2-10.lib" /MACHINE:X86 /SAFESEH:NO ".\Debug\fig2-10.obj"
          fig2-10.vcxproj -> C:\Users\Matthew\Documents\GitHub\CS440_GLC3.3\Final Project\.\Debug\fig2-10.exe
      1>Done Building Project "C:\Users\Matthew\Documents\GitHub\CS440_GLC3.3\Final Project\fig2-10.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.07
+Time Elapsed 00:00:02.55

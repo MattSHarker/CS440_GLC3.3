@@ -71,7 +71,9 @@ public:
 void angleFileOpen();
 void anglesAndOrigins(char*);
 void Display();
+void drawArrowHead(double, double, double, double);
 void drawBaseLines();
+void drawFlatHead(double, double, double, double);
 void drawVector(int, double);
 void drawVerticalLines();
 void figure31();
@@ -80,9 +82,9 @@ void irisFileOpen();
 void keyboard(unsigned char, int, int);
 void myInit();
 void readFileData(char*);
-void triangles(vector<double>);
 
 int startingWidth(int);
+
 double getMax(int);
 
 bool showArrowHead = true;
@@ -96,9 +98,11 @@ bool toggle = true;	// true means 3.1, false is 3.3
 const int numOfPoints = 4;	// we will be using 4D data for this program
 const int screenWidth = 640;
 const int screenHeight = 480;
-const double twoPi = 2 * 3.14159265;
-const double DEFAULT_SCALE = .95;
-double scale = DEFAULT_SCALE;	// Arbitrary size, modifies the scale of the vectors
+
+const double TWO_PI = 2 * 3.14159265;
+const double DEFAULT_ZOOM = .95;
+const double HEAD_SCALE = 6.0;
+double zoom = DEFAULT_ZOOM;	// Arbitrary size, modifies the scale of the vectors
 
 vector<float> angles;
 vector<float> xAxis;
@@ -109,11 +113,14 @@ vector<Iris> flowerVec;
 void main(int argc, char** argv)
 {
 	irisFileOpen();
+
+	/*	This was for debugging purposes
 	for (int i = 0; i < 150; i++)
 	{
 		flowerVec[i].print();
 		cout << " | " << i << endl;
 	}
+	*/
 
 	angleFileOpen();
 
@@ -123,7 +130,7 @@ void main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize(screenWidth, screenHeight);
 	glutInitWindowPosition(100, 150);
-	glutCreateWindow("Figures 3.1, 3.3");
+	glutCreateWindow("Figures 3.1 & 3.3");
 	glutDisplayFunc(Display);
 	glutKeyboardFunc(keyboard);
 	myInit();
@@ -147,14 +154,12 @@ void Display()
 
 	if (toggle)
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
 		drawVerticalLines();
 		drawBaseLines();
 		figure31();
 	}
 	else
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
 		drawVerticalLines();
 		drawBaseLines();
 		figure33();
@@ -204,8 +209,9 @@ void keyboard(unsigned char theKey, int mouseX, int mouseY)
 		Display();
 		break;
 
-	case '4':	// toggles black lines | 4 or shift + b
+	case '4':	// toggles black lines | 4 or shift + b or l
 	case 'B':
+	case 'l':
 		showBlack = !showBlack;
 		Display();
 		break;
@@ -216,17 +222,17 @@ void keyboard(unsigned char theKey, int mouseX, int mouseY)
 		break;
 
 	case 43:	// Increases vector size | ascii for plus (+)
-		scale += .05;
+		zoom += .05;
 		Display();
 		break;
 
 	case 45:	// Decreases vector size | ascii for minus (-)
-		scale -= .05;
+		zoom -= .05;
 		Display();
 		break;
 
 	case '0':	// resets the vector scale adjustor
-		scale = DEFAULT_SCALE;
+		zoom = DEFAULT_ZOOM;
 		Display();
 		break;
 
@@ -326,56 +332,93 @@ void anglesAndOrigins(char* fileName)
 	} // while getline
 }
 
+void drawArrowHead(double angle, double scale, double endX, double endY)
+{
+	glVertex2f(endX, endY);
+	glVertex2f(endX + cos((angle + 0.40) * TWO_PI) * scale, endY + sin((angle + 0.40) * TWO_PI) * scale);
+
+	glVertex2f(endX + cos((angle - 0.40) * TWO_PI) * scale, endY + sin((angle - 0.40) * TWO_PI) * scale);
+	glVertex2f(endX, endY);
+}
+
 void drawBaseLines()
 {
 	glColor3f(0.0f, 0.0f, 0.0f);
-	//glLineWidth((GLfloat)8.0);
-	for (int i = 0; i < 4; i++)
+	
+	double baseLineScale = 10.0;
+
+	if (toggle)
 	{
-		double startX = xAxis[i] * screenWidth;
-		double startY = yAxis[i] * screenHeight;
-		
-		double cosAngle = cos(angles[i] * twoPi);
-		double sinAngle = sin(angles[i] * twoPi);
-
-		double length = screenWidth * 0.2 * scale; // an arbitrary size
-		
-		double endX = startX + cosAngle * length;
-		double endY = startY + sinAngle * length;
-
-		if (showBlack)
+		for (int i = 0; i < 4; i++)
 		{
-			// the body of the arrow
-			glVertex2f(startX, startY);
-			glVertex2f(endX, endY); // cos for x, sin for y
-
-			// the arrow head
-			if (showArrowHead)
-			{
-				double scale = 0.008;
-
-				glVertex2f(endX, endY); // cos for x, sin for y
-				glVertex2f(startX + cos((angles[i] - scale) * twoPi) * length * .95, startY + sin((angles[i] - scale) * twoPi) * length * .95);
-
-				glVertex2f(startX + cos((angles[i] + scale) * twoPi) * length * .95, startY + sin((angles[i] + scale) * twoPi) * length * .95);
-				glVertex2f(endX, endY);
-			}
-
-			// the flat head
-			else if (showFlatHead)
-			{
-				double scale = 7.0;
-
-				glVertex2f(endX, endY);
-				glVertex2f(endX + cos((angles[i] + 0.25) * twoPi) * scale, endY + sin((angles[i] + 0.25) * twoPi) * scale);
-
-				glVertex2f(endX + cos((angles[i] - 0.25) * twoPi) * scale, endY + sin((angles[i] - 0.25) * twoPi) * scale);
-				glVertex2f(endX, endY);
-			}
-
-		}
+			double startX = xAxis[i] * screenWidth;
+			double startY = yAxis[i] * screenHeight;
 		
+			double cosAngle = cos(angles[i] * TWO_PI);
+			double sinAngle = sin(angles[i] * TWO_PI);
+
+			double length = screenWidth * 0.2 * zoom; // an arbitrary size
+		
+			double endX = startX + cosAngle * length;
+			double endY = startY + sinAngle * length;
+
+			if (showBlack)
+			{
+				// the body of the arrow
+				glVertex2f(startX, startY);
+				glVertex2f(endX, endY); // cos for x, sin for y
+
+				// the arrow head
+				if (showArrowHead)
+					drawArrowHead(angles[i], baseLineScale, endX, endY);
+
+				// the flat head
+				else if (showFlatHead)
+					drawFlatHead(angles[i], baseLineScale, endX, endY);
+			}
+		}
 	}
+	else
+	{
+		double startX = xAxis[0] * screenWidth;
+		double startY = yAxis[0] * screenHeight;
+
+		for (int i = 0; i < 4; i++)
+		{
+			double cosAngle = cos(angles[i] * TWO_PI);
+			double sinAngle = sin(angles[i] * TWO_PI);
+
+			double length = screenWidth * 0.2 * zoom; // an arbitrary size
+		
+			double endX = startX + cosAngle * length;
+			double endY = startY + sinAngle * length;
+
+			if (showBlack)
+			{
+				// the body of the arrow
+				glVertex2f(startX, startY);
+				glVertex2f(endX, endY); // cos for x, sin for y
+
+				// the arrow head
+				if (showArrowHead)
+					drawArrowHead(angles[i], baseLineScale, endX, endY);
+
+				// the flat head
+				else if (showFlatHead)
+					drawFlatHead(angles[i], baseLineScale, endX, endY);
+			}
+
+			// make the next line start at the end of the one before it
+			startX = endX;	
+			startY = endY;
+		}
+	}
+}
+
+void drawFlatHead(double angle, double scale, double endX, double endY)
+{
+	glVertex2f(endX + cos((angle + 0.25) * TWO_PI) * scale, endY + sin((angle + 0.25) * TWO_PI) * scale);
+	glVertex2f(endX + cos((angle - 0.25) * TWO_PI) * scale, endY + sin((angle - 0.25) * TWO_PI) * scale);
 }
 
 void drawVerticalLines()
@@ -400,11 +443,11 @@ void figure31()
 			double startX = xAxis[j] * screenWidth;
 			double startY = yAxis[j] * screenHeight;
 
-			double cosAngle = cos(angles[j] * twoPi);
-			double sinAngle = sin(angles[j] * twoPi);
+			double cosAngle = cos(angles[j] * TWO_PI);
+			double sinAngle = sin(angles[j] * TWO_PI);
 
 			double currData = currIris.getData(j);
-			double length = (screenWidth * 0.2 * scale * currData) / max; // determines the size of the line
+			double length = (screenWidth * 0.2 * zoom * currData) / max; // determines the size of the line
 
 			double endX = startX + cosAngle * length;
 			double endY = startY + sinAngle * length;
@@ -415,33 +458,17 @@ void figure31()
 				if (showRed)
 				{
 					glColor4f(1.0f, 0.0f, 0.0f, 1.0f);	// set line color to red
-
-					//startY -= 3;
-					//endY -= 3;
-
+					
 					glVertex2d(startX, startY);
 					glVertex2d(endX, endY);
 
+					// the arrow head
 					if (showArrowHead)
-					{
-						glVertex2f(endX, endY); // cos for x, sin for y
-						glVertex2f(startX + cos((angles[j] - 0.005) * twoPi) * length * .95, startY + sin((angles[j] - 0.005) * twoPi) * length * .95);
-
-						glVertex2f(startX + cos((angles[j] + 0.005) * twoPi) * length * .95, startY + sin((angles[j] + 0.005) * twoPi) * length * .95);
-						glVertex2f(endX, endY);
-					}
+						drawArrowHead(angles[j], HEAD_SCALE, endX, endY);
 					
 					// the flat head
 					else if (showFlatHead)
-					{
-						double scale = 5.0;
-
-						glVertex2f(endX, endY);
-						glVertex2f(endX + cos((angles[j] + 0.25) * twoPi) * scale, endY + sin((angles[j] + 0.25) * twoPi) * scale);
-
-						glVertex2f(endX + cos((angles[j] - 0.25) * twoPi) * scale, endY + sin((angles[j] - 0.25) * twoPi) * scale);
-						glVertex2f(endX, endY);
-					}
+						drawFlatHead(angles[j], HEAD_SCALE, endX, endY);
 				}
 
 				break;
@@ -450,36 +477,18 @@ void figure31()
 				if (showGreen)
 				{
 					glColor4f(0.0f, 1.0f, 0.0f, 1.0f);	//set line color to green
-					glLineWidth(4.0);
-									
-					//startY -= 6;
-					//endY -= 6;
-
+					
 					// the body of the arrow
 					glVertex2d(startX, startY);
 					glVertex2d(endX, endY);
 
 					// the arrow head
 					if (showArrowHead)
-					{
-						glVertex2f(endX, endY); // cos for x, sin for y
-						glVertex2f(startX + cos((angles[j] - 0.005) * twoPi) * length * .95, startY + sin((angles[j] - 0.005) * twoPi) * length * .95);
-
-						glVertex2f(startX + cos((angles[j] + 0.005) * twoPi) * length * .95, startY + sin((angles[j] + 0.005) * twoPi) * length * .95);
-						glVertex2f(endX, endY);
-					}
+						drawArrowHead(angles[j], HEAD_SCALE, endX, endY);
 					
 					// the flat head
 					else if (showFlatHead)
-					{
-						double scale = 5.0;
-
-						glVertex2f(endX, endY);
-						glVertex2f(endX + cos((angles[j] + 0.25) * twoPi) * scale, endY + sin((angles[j] + 0.25) * twoPi) * scale);
-
-						glVertex2f(endX + cos((angles[j] - 0.25) * twoPi) * scale, endY + sin((angles[j] - 0.25) * twoPi) * scale);
-						glVertex2f(endX, endY);
-					}
+						drawFlatHead(angles[j], HEAD_SCALE, endX, endY);
 				}
 
 				break;
@@ -488,10 +497,6 @@ void figure31()
 				if (showBlue)
 				{
 					glColor4f(0.0f, 0.0f, 1.0f, 1.0f);	//set line color to blue
-					glLineWidth(4.0);
-
-					//startY -= 9;
-					//endY -= 9;
 
 					// body of the arrow
 					glVertex2d(startX, startY);
@@ -499,25 +504,11 @@ void figure31()
 
 					// the arrow head
 					if (showArrowHead)
-					{
-						glVertex2f(endX, endY); // cos for x, sin for y
-						glVertex2f(startX + cos((angles[j] - 0.005) * twoPi) * length * .95, startY + sin((angles[j] - 0.005) * twoPi) * length * .95);
-
-						glVertex2f(startX + cos((angles[j] + 0.005) * twoPi) * length * .95, startY + sin((angles[j] + 0.005) * twoPi) * length * .95);
-						glVertex2f(endX, endY);
-					}
+						drawArrowHead(angles[j], HEAD_SCALE, endX, endY);
 					
 					// the flat head
 					else if (showFlatHead)
-					{
-						double scale = 5.0;
-
-						glVertex2f(endX, endY);
-						glVertex2f(endX + cos((angles[j] + 0.25) * twoPi) * scale, endY + sin((angles[j] + 0.25) * twoPi) * scale);
-
-						glVertex2f(endX + cos((angles[j] - 0.25) * twoPi) * scale, endY + sin((angles[j] - 0.25) * twoPi) * scale);
-						glVertex2f(endX, endY);
-					}
+						drawFlatHead(angles[j], HEAD_SCALE, endX, endY);
 				}
 
 				break;
@@ -540,46 +531,31 @@ void figure33()
 			double max = getMax(j);
 
 			double currData = currIris.getData(j);
-			double length = screenWidth * 0.2 * scale * currData / max; // determines the size of the line
+			double length = screenWidth * 0.2 * zoom * currData / max; // determines the size of the line
 			
-			double cosAngle = cos(angles[j] * twoPi);
-			double sinAngle = sin(angles[j] * twoPi);
+			double cosAngle = cos(angles[j] * TWO_PI);
+			double sinAngle = sin(angles[j] * TWO_PI);
 
 			double endX = startX + cosAngle * length;
 			double endY = startY + sinAngle * length;
-			
+
 			switch(currIris.flowerType)
 			{
 			case Iris::SETOSA:
 				if (showRed == true)
 				{
 					glColor4f(1.0f, 0.0f, 0.0f, 1.0f);	//set line color to red
-					glLineWidth(4.0);
 
 					glVertex2d(startX, startY);
 					glVertex2d(endX, endY);
 
 					// the arrow head
 					if (showArrowHead)
-					{
-						glVertex2f(endX, endY); // cos for x, sin for y
-						glVertex2f(startX + cos((angles[j] - 0.005) * twoPi) * length * .95, startY + sin((angles[j] - 0.005) * twoPi) * length * .95);
-
-						glVertex2f(startX + cos((angles[j] + 0.005) * twoPi) * length * .95, startY + sin((angles[j] + 0.005) * twoPi) * length * .95);
-						glVertex2f(endX, endY);
-					}
+						drawArrowHead(angles[j], HEAD_SCALE, endX, endY);
 					
 					// the flat head
 					else if (showFlatHead)
-					{
-						double scale = 5.0;
-
-						glVertex2f(endX, endY);
-						glVertex2f(endX + cos((angles[j] + 0.25) * twoPi) * scale, endY + sin((angles[j] + 0.25) * twoPi) * scale);
-
-						glVertex2f(endX + cos((angles[j] - 0.25) * twoPi) * scale, endY + sin((angles[j] - 0.25) * twoPi) * scale);
-						glVertex2f(endX, endY);
-					}
+						drawFlatHead(angles[j], HEAD_SCALE, endX, endY);
 				}
 				break;
 
@@ -587,40 +563,24 @@ void figure33()
 				if (showGreen)
 				{
 					glColor4f(0.0f, 1.0f, 0.0f, 1.0f);	//set line color to green
-					glLineWidth(4.0);
 				
 					glVertex2d(startX, startY);
 					glVertex2d(endX, endY);
 
 					// the arrow head
 					if (showArrowHead)
-					{
-						glVertex2f(endX, endY); // cos for x, sin for y
-						glVertex2f(startX + cos((angles[j] - 0.005) * twoPi) * length * .95, startY + sin((angles[j] - 0.005) * twoPi) * length * .95);
-
-						glVertex2f(startX + cos((angles[j] + 0.005) * twoPi) * length * .95, startY + sin((angles[j] + 0.005) * twoPi) * length * .95);
-						glVertex2f(endX, endY);
-					}
+						drawArrowHead(angles[j], HEAD_SCALE, endX, endY);
 					
 					// the flat head
 					else if (showFlatHead)
-					{
-						double scale = 5.0;
-
-						glVertex2f(endX, endY);
-						glVertex2f(endX + cos((angles[j] + 0.25) * twoPi) * scale, endY + sin((angles[j] + 0.25) * twoPi) * scale);
-
-						glVertex2f(endX + cos((angles[j] - 0.25) * twoPi) * scale, endY + sin((angles[j] - 0.25) * twoPi) * scale);
-						glVertex2f(endX, endY);
-					}
+						drawFlatHead(angles[j], HEAD_SCALE, endX, endY);
 				}
 				break;
 
 			case Iris::VIRGINICA:
 				if (showBlue)
 				{
-					glColor4f(0.0f, 0.0f, 1.0f, 1.0f);	//set line color to green
-					glLineWidth(4.0);
+					glColor4f(0.0f, 0.0f, 1.0f, 1.0f);	//set line color to blue
 				
 					// the body of the line
 					glVertex2d(startX, startY);
@@ -628,28 +588,14 @@ void figure33()
 
 					// the arrow head
 					if (showArrowHead)
-					{
-						glVertex2f(endX, endY); // cos for x, sin for y
-						glVertex2f(startX + cos((angles[j] - 0.005) * twoPi) * length * .95, startY + sin((angles[j] - 0.005) * twoPi) * length * .95);
-
-						glVertex2f(startX + cos((angles[j] + 0.005) * twoPi) * length * .95, startY + sin((angles[j] + 0.005) * twoPi) * length * .95);
-						glVertex2f(endX, endY);
-					}
+						drawArrowHead(angles[j], HEAD_SCALE, endX, endY);
 					
 					// the flat head
 					else if (showFlatHead)
-					{
-						double scale = 5.0;
-
-						glVertex2f(endX, endY);
-						glVertex2f(endX + cos((angles[j] + 0.25) * twoPi) * scale, endY + sin((angles[j] + 0.25) * twoPi) * scale);
-
-						glVertex2f(endX + cos((angles[j] - 0.25) * twoPi) * scale, endY + sin((angles[j] - 0.25) * twoPi) * scale);
-						glVertex2f(endX, endY);
-					}
+						drawFlatHead(angles[j], HEAD_SCALE, endX, endY);
 				}
-
 				break;
+
 			}	// switch case
 
 			// make the next line start at the end of the one before it
@@ -663,7 +609,6 @@ void figure33()
 void irisFileOpen()
 {
 	// opens a file chooser dialog to selected a data file to load data from
-
 	char filename[MAX_PATH];
 
 	OPENFILENAME ofn;
@@ -681,9 +626,8 @@ void irisFileOpen()
 	if (GetOpenFileName(&ofn) == TRUE)
 		readFileData(filename);
 
-	else {
+	else
 		std::cout << "test";
-	}
 }
 
 void readFileData(char* fileName)
@@ -706,16 +650,14 @@ void readFileData(char* fileName)
 		{
 			vector<double> tempFlower;
 
-			while (str.size() > 0) {
-
+			while (str.size() > 0)
+			{
 				tokenStart = 0;
 				tokenEnd = str.find_first_of(',');
 				
 
 				if (tokenEnd < 0)
-				{
 					tokenEnd = str.size();
-				}
 
 				int tokenLength = tokenEnd - tokenStart;
 				string currentToken = str.substr(tokenStart, tokenLength);
