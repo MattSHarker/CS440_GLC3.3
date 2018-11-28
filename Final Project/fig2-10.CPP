@@ -16,9 +16,6 @@ using namespace std;
 
 /******************* This program is designed for 4D data, please use the provided data to ensure it works as intended **********************/
 
-int round(double);	// this needs to be up here for the iris class
-int numOfDimensions = 0;	// this will be overwritten
-
 class Iris
 {
 public:
@@ -29,12 +26,14 @@ public:
 	
 	Iris(vector<double> vec)
 	{
-		for (int i = 0; i < numOfDimensions; i++)
+		int tempSize = vec.size() - 1;
+
+		for (int i = 0; i < tempSize; i++)
 		{
 			data.push_back(vec[i]);
 		}
 
-		int intType = round(vec[4]);
+		int intType = vec[tempSize];
 
 		if (intType == 1.0)
 			flowerType = SETOSA;
@@ -66,7 +65,6 @@ public:
 		else
 			cout << "ERROR" << endl;
 	}
-
 };
 
 void angleFileOpen();
@@ -114,14 +112,6 @@ vector<Iris> flowerVec;
 void main(int argc, char** argv)
 {
 	irisFileOpen();
-
-	/*	This was for debugging purposes
-	for (int i = 0; i < 150; i++)
-	{
-		flowerVec[i].print();
-		cout << " | " << i << endl;
-	}
-	*/
 
 	angleFileOpen();
 
@@ -350,7 +340,7 @@ void drawBaseLines()
 
 	if (toggle)
 	{
-		for (int i = 0; i < numOfDimensions; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			double startX = xAxis[i] * screenWidth;
 			double startY = yAxis[i] * screenHeight;
@@ -384,7 +374,7 @@ void drawBaseLines()
 		double startX = xAxis[0] * screenWidth;
 		double startY = yAxis[0] * screenHeight;
 
-		for (int i = 0; i < numOfDimensions; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			double cosAngle = cos(angles[i] * TWO_PI);
 			double sinAngle = sin(angles[i] * TWO_PI);
@@ -436,7 +426,7 @@ void figure31()
 {
 	for (int i = 0; i < flowerVec.size(); i++)
 	{
-		for (int j = 0; j < numOfDimensions; j++)
+		for (int j = 0; j < 4; j++)
 		{
 			double max = getMax(j);
 			Iris currIris = flowerVec[i];
@@ -527,7 +517,7 @@ void figure33()
 		double startX = xAxis[0] * screenWidth;
 		double startY = yAxis[0] * screenHeight;		
 		
-		for (int j = 0; j < numOfDimensions; j++)
+		for (int j = 0; j < 4; j++)
 		{
 			double max = getMax(j);
 
@@ -635,10 +625,7 @@ void readFileData(char* fileName)
 {
 	ifstream file(fileName);
 	string str;
-	
-	bool firstTimeThrough = true;
-	int dimCounter = -1;
-	
+
 	// ignore first line(headers)
 	if (getline(file, str));
 
@@ -683,17 +670,8 @@ void readFileData(char* fileName)
 				{
 					str = str.substr(tokenEnd + 1, str.size() - tokenLength + 1);
 				}
-				
-				if (firstTimeThrough)
-					dimCounter++;
 			} // while
-			
-			if (firstTimeThrough)
-			{
-				numOfDimensions = dimCounter;
-				firstTimeThrough = false;
-			}
-			
+
 			Iris iris(tempFlower);
 			flowerVec.push_back(iris);	
 
