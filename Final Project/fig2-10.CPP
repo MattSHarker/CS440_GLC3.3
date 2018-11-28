@@ -4,6 +4,7 @@
 #include <gl/GL.h>
 #include "glut.h"
 #include <vector>
+#include <array>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -16,15 +17,16 @@ using namespace std;
 
 /******************* This program is designed for 4D data, please use the provided data to ensure it works as intended **********************/
 
+vector<vector<float>> colorList;
+
 class Iris
 {
 public:
-	vector<double> data;		// the data points of the flower
-	enum Types { SETOSA, VERSICOLOR, VIRGINICA };
-
-	Types flowerType;
+	vector<double> data;	// the data points of the flower
+	vector<float> color;	// the color of the line
+	float red, green, blue;
 	
-	Iris(vector<double> vec)
+	Iris(vector<double> vec, vector<float> col)
 	{
 		int tempSize = vec.size() - 1;
 
@@ -33,17 +35,13 @@ public:
 			data.push_back(vec[i]);
 		}
 
-		int intType = vec[tempSize];
-
-		if (intType == 1.0)
-			flowerType = SETOSA;
-		else if (intType == 2.0)
-			flowerType = VERSICOLOR;
-		else if(intType == 3.0)
-			flowerType = VIRGINICA;
+		for (int i = 0; i < 4; i ++)
+		{
+			color[i] = col[i];
+		}
 	}
 
-	Types getType() { return flowerType; }
+	vector<float> getColor() { }
 	double getData(int i) { return data[i]; }
 	vector<double> getData() { return data; }
 
@@ -55,17 +53,88 @@ public:
 		double d4 = data[3];
 
 		printf("%0.1f %0.1f %0.1f %0.1f ", d1, d2, d3, d4);	// using printf here so doubles like 3.0 will print the .0
-
-		if (flowerType == SETOSA)
-			cout << "Setosa";
-		else if(flowerType == VERSICOLOR)
-			cout << "Versicolor";
-		else if (flowerType == VIRGINICA)
-			cout << "Virginica";
-		else
-			cout << "ERROR" << endl;
+		printf(" | Red: %0.3f  Blue : %0.3f  Green: %0.3f  Alpha: %0.3f ", color[0], color[1], color[2], color[3]);
 	}
 };
+
+
+vector<float> setupColors()
+{
+	// this would have been a lot shorter is VS2012's compiler could
+	// handle the {} operator way of initializing vectors ( ._.)
+
+	vector<float> red; // {0.902, 0.098, 0.294, 1.0};
+	red.push_back(0.902);	// red
+	red.push_back(0.098);	// green
+	red.push_back(0.294);	// blue
+	red.push_back(1.000);	// alpha
+
+	vector<float> orange; // {0.902, 0.098, 0.294, 1.0};
+	red.push_back(0.961);	// red
+	red.push_back(0.510);	// green
+	red.push_back(0.192);	// blue
+	red.push_back(1.000);	// alpha
+	
+	vector<float> yellow; // {0.902, 0.098, 0.294, 1.0};
+	red.push_back(1.000);	// red
+	red.push_back(0.882);	// green
+	red.push_back(0.098);	// blue
+	red.push_back(1.000);	// alpha
+
+	vector<float> lime; // {0.902, 0.098, 0.294, 1.0};
+	red.push_back(0.749);	// red
+	red.push_back(0.937);	// green
+	red.push_back(0.271);	// blue
+	red.push_back(1.000);	// alpha
+	
+	vector<float> green; // {0.902, 0.098, 0.294, 1.0};
+	red.push_back(0.235);	// red
+	red.push_back(0.706);	// green
+	red.push_back(0.294);	// blue
+	red.push_back(1.000);	// alpha
+
+	vector<float> cyan; // {0.902, 0.098, 0.294, 1.0};
+	red.push_back(0.259);	// red
+	red.push_back(0.931);	// green
+	red.push_back(0.957);	// blue
+	red.push_back(1.000);	// alpha
+
+	vector<float> blue; // {0.902, 0.098, 0.294, 1.0};
+	red.push_back(0.263);	// red
+	red.push_back(0.388);	// green
+	red.push_back(0.847);	// blue
+	red.push_back(1.000);	// alpha
+
+	vector<float> purple; // {0.902, 0.098, 0.294, 1.0};
+	red.push_back(0.569);	// red
+	red.push_back(0.118);	// green
+	red.push_back(0.706);	// blue
+	red.push_back(1.000);	// alpha
+
+	vector<float> magenta; // {0.902, 0.098, 0.294, 1.0};
+	red.push_back(0.941);	// red
+	red.push_back(0.196);	// green
+	red.push_back(0.902);	// blue
+	red.push_back(1.000);	// alpha
+
+	vector<float> lavender; // {0.902, 0.098, 0.294, 1.0};
+	red.push_back(0.902);	// red
+	red.push_back(0.745);	// green
+	red.push_back(1.000);	// blue
+	red.push_back(1.000);	// alpha
+
+
+	colorList.push_back(red);
+	colorList.push_back(orange);
+	colorList.push_back(yellow);
+	colorList.push_back(lime);
+	colorList.push_back(green);
+	colorList.push_back(cyan);
+	colorList.push_back(blue);
+	colorList.push_back(purple);
+	colorList.push_back(magenta);
+	colorList.push_back(lavender);
+}
 
 void angleFileOpen();
 void anglesAndOrigins(char*);
@@ -94,7 +163,7 @@ bool showBlue = true;
 bool showBlack = true;
 bool toggle = true;	// true means 3.1, false is 3.3
 
-const int numOfPoints = 4;	// we will be using 4D data for this program
+int numOfPoints = 4;	// we will be using 4D data for this program
 const int screenWidth = 640;
 const int screenHeight = 480;
 
@@ -626,6 +695,11 @@ void readFileData(char* fileName)
 	ifstream file(fileName);
 	string str;
 
+	vector<vector<double>> tempIrisVec;
+	
+	bool firstTime = true;
+	int counter = -1;
+
 	// ignore first line(headers)
 	if (getline(file, str));
 
@@ -670,12 +744,22 @@ void readFileData(char* fileName)
 				{
 					str = str.substr(tokenEnd + 1, str.size() - tokenLength + 1);
 				}
+				
+				counter++;
 			} // while
 
-			Iris iris(tempFlower);
-			flowerVec.push_back(iris);	
+			if (firstTime)
+				numOfPoints = counter;
+			
+			tempIrisVec.push_back(tempFlower);
 
 		} // else
+	}
+
+	for (int i = 0; i < numOfPoints; i++)
+	{
+		Iris tempIris(tempIrisVec[i], colorList[i]);
+		flowerVec.push_back(tempIris);
 	}
 
 	ss.clear();
